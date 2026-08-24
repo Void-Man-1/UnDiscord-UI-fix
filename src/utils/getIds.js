@@ -1,32 +1,72 @@
 import { log } from './log';
 
-export function getToken() {
-  window.dispatchEvent(new Event('beforeunload'));
-  const LS = document.body.appendChild(document.createElement('iframe')).contentWindow.localStorage;
+function readLocalStorageJson(key) {
+  const iframe = document.createElement('iframe');
+  iframe.hidden = true;
+  document.body.appendChild(iframe);
   try {
-    return JSON.parse(LS.token);
-  } catch {
-    log.info('Could not automatically detect Authorization Token in local storage!');
-    log.info('Attempting to grab token using webpack');
-    return (window.webpackChunkdiscord_app.push([[''], {}, e => { window.m = []; for (let c in e.c) window.m.push(e.c[c]); }]), window.m).find(m => m?.exports?.default?.getToken !== void 0).exports.default.getToken();
+    const value = iframe.contentWindow?.localStorage?.getItem(key);
+    return value === null ? null : JSON.parse(value);
+  } finally {
+    iframe.remove();
   }
 }
 
+function findWebpackExport(methodName) {
+  const webpackChunks = window.webpackChunkdiscord_app;
+  if (!webpackChunks?.push) return null;
+
+  let webpackRequire;
+  const chunkId = `undiscord_${Date.now()}_${Math.random()}`;
+  webpackChunks.push([[chunkId], {}, require => { webpackRequire = require; }]);
+  webpackChunks.pop();
+
+  if (!webpackRequire?.c) return null;
+  for (const module of Object.values(webpackRequire.c)) {
+    const candidates = [module?.exports, module?.exports?.default];
+    for (const candidate of candidates) {
+      try {
+        if (typeof candidate?.[methodName] === 'function') return candidate;
+      } catch {
+        // Some Discord modules expose getters that throw before initialization.
+      }
+    }
+  }
+  return null;
+}
+
+export function getToken() {
+  const storedToken = readLocalStorageJson('token');
+  if (storedToken) return storedToken;
+
+  log.info('Could not automatically detect Authorization Token in local storage!');
+  log.info('Attempting to grab token using webpack');
+  const tokenStore = findWebpackExport('getToken');
+  const token = tokenStore?.getToken();
+  if (!token) throw new Error('Discord token store was not found.');
+  return token;
+}
+
 export function getAuthorId() {
-  const LS = document.body.appendChild(document.createElement('iframe')).contentWindow.localStorage;
-  return JSON.parse(LS.user_id_cache);
+  const storedId = readLocalStorageJson('user_id_cache');
+  if (storedId) return storedId;
+
+  const userStore = findWebpackExport('getCurrentUser');
+  const authorId = userStore?.getCurrentUser()?.id;
+  if (!authorId) throw new Error('Discord current-user store was not found.');
+  return authorId;
 }
 
 export function getGuildId() {
   const m = location.href.match(/channels\/([\w@]+)\/(\d+)/);
   if (m) return m[1];
-  else alert('Could not find the Guild ID!\nPlease make sure you are on a Server or DM.');
+  log.error('Could not find the Server ID. Make sure you are viewing a server channel or DM.');
 }
 
 export function getChannelId() {
   const m = location.href.match(/channels\/([\w@]+)\/(\d+)/);
   if (m) return m[2];
-  else alert('Could not find the Channel ID!\nPlease make sure you are on a Channel or DM.');
+  log.error('Could not find the Channel ID. Make sure you are viewing a server channel or DM.');
 }
 
 export function fillToken() {

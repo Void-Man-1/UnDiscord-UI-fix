@@ -1,4 +1,4 @@
-<div id="undiscord" class="browser container redact" style="display:none;">
+<div id="undiscord" class="browser container" role="dialog" aria-label="Undiscord bulk message deletion" style="display:none;">
     <div class="header">
         <svg class="icon" aria-hidden="false" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor" d="M15 3.999V2H9V3.999H3V5.999H21V3.999H15Z"></path>
@@ -10,13 +10,13 @@
         <div class="vert-divider"></div>
         <span> Bulk delete messages</span>
         <div class="spacer"></div>
-        <div id="hide" class="icon" aria-label="Close" role="button" tabindex="0">
+        <button id="hide" class="icon" type="button" aria-label="Close Undiscord" title="Close Undiscord">
             <svg aria-hidden="false" width="24" height="24" viewBox="0 0 24 24">
                 <path fill="currentColor"
                     d="M18.4 4L12 10.4L5.6 4L4 5.6L10.4 12L4 18.4L5.6 20L12 13.6L18.4 20L20 18.4L13.6 12L20 5.6L18.4 4Z">
                 </path>
             </svg>
-        </div>
+        </button>
     </div>
     <div class="window-body" style="display: flex; flex-direction: row;">
         <div class="sidebar scroll">
@@ -29,9 +29,9 @@
                     </legend>
                     <div class="multiInput">
                         <div class="input-wrapper">
-                            <input class="input" id="authorId" type="text" priv>
+                            <input class="input" id="authorId" type="text" aria-label="Author ID" inputmode="numeric" priv>
                         </div>
-                        <button id="getAuthor">me</button>
+                        <button id="getAuthor" type="button">me</button>
                     </div>
                 </fieldset>
                 <hr>
@@ -42,9 +42,9 @@
                     </legend>
                     <div class="multiInput">
                         <div class="input-wrapper">
-                            <input class="input" id="guildId" type="text" priv>
+                            <input class="input" id="guildId" type="text" aria-label="Server ID" priv>
                         </div>
-                        <button id="getGuild">current</button>
+                        <button id="getGuild" type="button">current</button>
                     </div>
                 </fieldset>
                 <fieldset>
@@ -54,9 +54,9 @@
                     </legend>
                     <div class="multiInput mb1">
                         <div class="input-wrapper">
-                            <input class="input" id="channelId" type="text" priv>
+                            <input class="input" id="channelId" type="text" aria-label="Channel ID" priv>
                         </div>
-                        <button id="getChannel">current</button>
+                        <button id="getChannel" type="button">current</button>
                     </div>
                     <div class="sectionDescription">
                         <label class="row"><input id="includeNsfw" type="checkbox">This is a NSFW channel</label>
@@ -71,7 +71,7 @@
                         <a href="{{WIKI}}/importJson" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
                     <div class="input-wrapper">
-                        <input type="file" id="importJsonInput" accept="application/json,.json" style="width:100%";>
+                        <input type="file" id="importJsonInput" aria-label="Import Discord messages index JSON" accept="application/json,.json" style="width:100%;">
                     </div>
                     <div class="sectionDescription">
                         <br>
@@ -89,7 +89,7 @@
                         <a href="{{WIKI}}/filters" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
                     <div class="input-wrapper">
-                        <input id="search" type="text" placeholder="Containing text" priv>
+                        <input id="search" type="text" aria-label="Message text filter" placeholder="Containing text" priv>
                     </div>
                     <div class="sectionDescription">
                         Only delete messages that contain the text
@@ -115,7 +115,7 @@
                     </div>
                     <div class="input-wrapper">
                         <span class="info">/</span>
-                        <input id="pattern" type="text" placeholder="regular expression" priv>
+                        <input id="pattern" type="text" aria-label="Regular expression filter" placeholder="regular expression" priv>
                         <span class="info">/</span>
                     </div>
                 </fieldset>
@@ -129,15 +129,15 @@
                     </legend>
                     <div class="multiInput mb1">
                         <div class="input-wrapper">
-                            <input id="minId" type="text" placeholder="After a message" priv>
+                            <input id="minId" type="text" aria-label="Delete after message ID" placeholder="After a message" inputmode="numeric" priv>
                         </div>
-                        <button id="pickMessageAfter">Pick</button>
+                        <button id="pickMessageAfter" type="button">Pick</button>
                     </div>
                     <div class="multiInput">
                         <div class="input-wrapper">
-                            <input id="maxId" type="text" placeholder="Before a message" priv>
+                            <input id="maxId" type="text" aria-label="Delete before message ID" placeholder="Before a message" inputmode="numeric" priv>
                         </div>
-                        <button id="pickMessageBefore">Pick</button>
+                        <button id="pickMessageBefore" type="button">Pick</button>
                     </div>
                     <div class="sectionDescription">
                         Specify an interval to delete messages.
@@ -152,14 +152,14 @@
                         <a href="{{WIKI}}/dateRange" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
                     <div class="input-wrapper mb1">
-                        <input id="minDate" type="datetime-local" title="Messages posted AFTER this date">
+                        <input id="minDate" type="datetime-local" aria-label="Delete messages after date" title="Messages posted AFTER this date">
                     </div>
                     <legend>
                         Before date
                         <a href="{{WIKI}}/dateRange" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
                     <div class="input-wrapper">
-                        <input id="maxDate" type="datetime-local" title="Messages posted BEFORE this date">
+                        <input id="maxDate" type="datetime-local" aria-label="Delete messages before date" title="Messages posted BEFORE this date">
                     </div>
                     <div class="sectionDescription">
                         Delete messages that were posted between the two dates.
@@ -177,8 +177,8 @@
                         Search delay
                         <a href="{{WIKI}}/delay" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
-                    <div class="input-wrapper">
-                        <input id="searchDelay" type="range" value="30000" step="100" min="100" max="60000">
+                    <div class="input-wrapper rangeInput">
+                        <input id="searchDelay" type="range" aria-label="Search delay in milliseconds" min="100" max="60000" step="100" value="30000">
                         <div id="searchDelayValue"></div>
                     </div>
                 </fieldset>
@@ -187,8 +187,8 @@
                         Delete delay
                         <a href="{{WIKI}}/delay" title="Help" target="_blank" rel="noopener noreferrer">help</a>
                     </legend>
-                    <div class="input-wrapper">
-                        <input id="deleteDelay" type="range" value="1000" step="50" min="50" max="10000">
+                    <div class="input-wrapper rangeInput">
+                        <input id="deleteDelay" type="range" aria-label="Delete delay in milliseconds" min="50" max="10000" step="50" value="1000">
                         <div id="deleteDelayValue"></div>
                     </div>
                     <br>
@@ -205,9 +205,9 @@
                     </legend>
                     <div class="multiInput">
                         <div class="input-wrapper">
-                            <input class="input" id="token" type="text" autocomplete="dont" priv>
+                            <input class="input" id="token" type="password" aria-label="Discord authorization token" autocomplete="off" priv>
                         </div>
-                        <button id="getToken">fill</button>
+                        <button id="getToken" type="button">fill</button>
                     </div>
                 </fieldset>
             </details>
@@ -221,30 +221,30 @@
         <div class="main col">
             <div class="tbar col">
                 <div class="row">
-                    <button id="toggleSidebar" class="sizeMedium icon">☰</button>
-                    <button id="start" class="sizeMedium danger" style="width: 150px;" title="Start the deletion process">▶︎ Delete</button>
-                    <button id="stop" class="sizeMedium" title="Stop the deletion process" disabled>🛑 Stop</button>
-                    <button id="clear" class="sizeMedium">Clear log</button>
+                    <button id="toggleSidebar" class="sizeMedium icon" type="button" aria-label="Toggle settings sidebar" aria-expanded="true">☰</button>
+                    <button id="start" class="sizeMedium danger" type="button" style="width: 150px;" title="Start the deletion process">▶︎ Delete</button>
+                    <button id="stop" class="sizeMedium" type="button" title="Stop the deletion process" disabled>🛑 Stop</button>
+                    <button id="clear" class="sizeMedium" type="button">Clear log</button>
                     <label class="row" title="Hide sensitive information on your screen for taking screenshots">
-                        <input id="redact" type="checkbox" checked> Streamer mode
+                        <input id="redact" type="checkbox"> Streamer mode
                     </label>
                 </div>
                 <div class="row">
                     <progress id="progressBar" style="display:none;"></progress>
                 </div>
             </div>
-            <pre id="logArea" class="logarea scroll">
-                <div class="" style="background: var(--background-mentioned); padding: .5em;">Notice: Undiscord may be working slower than usual and<wbr>require multiple attempts due to a recent Discord update.<br>We're working on a fix, and we thank you for your patience.</div>
-                <center>
+            <div id="logArea" class="logarea scroll" role="log" aria-live="polite" aria-label="Undiscord activity log">
+                <div class="notice">Review the selected IDs and filters carefully before deleting. Deleted messages cannot be restored.</div>
+                <div class="log-intro">
                     <div>Star <a href="{{HOME}}" target="_blank" rel="noopener noreferrer">this project</a> on GitHub!</div>
                     <div><a href="{{HOME}}/discussions" target="_blank" rel="noopener noreferrer">Issues or help</a></div>
-                </center>
-            </pre>
+                </div>
+            </div>
             <div class="tbar footer row">
-                <div id="progressPercent"></div>
+                <div id="progressPercent" role="status" aria-live="polite"></div>
                 <span class="spacer"></span>
-                <label>
-                    <input id="autoScroll" type="checkbox" checked> Auto scroll
+                <label title="Keep the Undiscord activity log pinned to its newest entry">
+                    <input id="autoScroll" type="checkbox" checked> Auto-scroll log
                 </label>
                 <div class="resize-handle"></div>
             </div>

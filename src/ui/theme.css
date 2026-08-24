@@ -1,13 +1,28 @@
 /* undiscord window */
+#undiscord {
+    --ud-surface: #202225;
+    --ud-surface-raised: #2b2d31;
+    --ud-surface-sunken: #17181c;
+    --ud-input-bg: #111214;
+    --ud-input-border: rgba(255, 255, 255, .16);
+    --ud-input-border-focus: #00a8fc;
+    --ud-button-bg: #4e5058;
+    --ud-button-hover: #5d6069;
+    --ud-danger: #da373c;
+    --ud-danger-hover: #a12828;
+    --ud-positive: #248046;
+    --ud-positive-hover: #1a6334;
+}
+
 #undiscord.browser {
     box-shadow: var(--shadow-border), var(--shadow-high);
-        border: 1px solid var(--border-subtle);
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, .12));
     overflow: hidden;
 }
 
 #undiscord.container,
 #undiscord .container {
-    background-color: var(--background-surface-high);
+    background-color: var(--background-surface-high, #2b2d31);
     border-radius: 8px;
     box-sizing: border-box;
     cursor: default;
@@ -15,7 +30,7 @@
 }
 
 #undiscord .header {
-    background-color: var(--background-tertiary);
+    background-color: var(--background-tertiary, #1e1f22);
     height: 48px;
     align-items: center;
     min-height: 48px;
@@ -29,12 +44,22 @@
     color: var(--interactive-normal);
     margin-right: 8px;
     flex-shrink: 0;
-    width: 24;
-    height: 24;
+    width: 24px;
+    height: 24px;
 }
 
 #undiscord .header .icon:hover {
     color: var(--interactive-hover);
+}
+
+#undiscord .header button.icon {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+    margin: 0;
+    padding: 4px;
+    background: transparent;
 }
 
 #undiscord .header h3 {
@@ -77,10 +102,11 @@
     font-size: 16px;
     box-sizing: border-box;
     width: 100%;
-    border-radius: 3px;
-    color: var(--text-default);
-    background-color: var(--input-background);
-    border: none;
+    gap: 6px;
+    border-radius: 8px;
+    color: var(--text-default, var(--text-normal, #dbdee1));
+    background: transparent;
+    border: 0;
     transition: border-color 0.2s ease-in-out 0s;
 }
 
@@ -89,7 +115,7 @@
 }
 
 #undiscord .multiInput button:last-child {
-    margin-right: 4px;
+    margin-right: 0;
 }
 
 #undiscord .input {
@@ -99,11 +125,11 @@
     padding: 10px;
     height: 44px;
     
-    background-color: var(--input-background);
-    border: 1px solid var(--input-border);
+    background-color: var(--ud-input-bg);
+    border: 1px solid var(--ud-input-border);
     border-radius: 8px;
     box-sizing: border-box;
-    color: var(--text-default);
+    color: var(--text-default, var(--text-normal, #dbdee1));
 }
 
 #undiscord fieldset {
@@ -116,10 +142,10 @@
     font-size: 16px;
     box-sizing: border-box;
     width: 100%;
-    border-radius: 3px;
-    color: var(--text-default);
-    background-color: var(--input-background);
-    border: none;
+    border-radius: 8px;
+    color: var(--text-default, var(--text-normal, #dbdee1));
+    background-color: var(--ud-input-bg);
+    border: 1px solid var(--ud-input-border);
     transition: border-color 0.2s ease-in-out 0s;
 }
 
@@ -127,18 +153,57 @@
 #undiscord input[type="search"],
 #undiscord input[type="password"],
 #undiscord input[type="datetime-local"],
-#undiscord input[type="number"],
-#undiscord input[type="range"] {
-    background-color: var(--input-background);
-    border: 1px solid var(--input-border);
+#undiscord input[type="number"] {
+    background-color: var(--ud-input-bg);
+    border: 1px solid var(--ud-input-border);
     border-radius: 8px;
     box-sizing: border-box;
-    color: var(--text-default);
+    color: var(--text-default, var(--text-normal, #dbdee1));
     font-size: 16px;
     height: 44px;
     padding: 12px 10px;
     transition: border-color .2s ease-in-out;
     width: 100%;
+}
+
+#undiscord .input-wrapper > input {
+    background: transparent;
+    border: 0;
+    outline: 0;
+}
+
+#undiscord input::placeholder {
+    color: var(--text-muted, #949ba4);
+    opacity: 1;
+}
+
+#undiscord input[type="range"] {
+    width: 100%;
+    height: 20px;
+    margin: 8px 0;
+    padding: 0;
+    border: 0;
+    accent-color: var(--brand-500, #5865f2);
+}
+
+#undiscord input[type="checkbox"] {
+    accent-color: var(--brand-500, #5865f2);
+}
+
+#undiscord input[type="file"] {
+    width: 100%;
+    color: var(--text-muted, #b5bac1);
+    font-size: 13px;
+}
+
+#undiscord input[type="file"]::file-selector-button {
+    margin-right: 8px;
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 4px;
+    color: #fff;
+    background: var(--ud-button-bg);
+    cursor: pointer;
 }
 
 #undiscord .divider,
@@ -188,7 +253,20 @@
 
     /* lookFilled colorPrimary */
     color: rgb(255, 255, 255);
-    background-color: var(--button-secondary-background);
+    background-color: var(--button-secondary-background, var(--ud-button-bg));
+    cursor: pointer;
+}
+
+#undiscord button:hover {
+    background-color: var(--button-secondary-background-hover, var(--ud-button-hover));
+}
+
+#undiscord button:focus-visible,
+#undiscord input:focus-visible,
+#undiscord summary:focus-visible,
+#undiscord a:focus-visible {
+    outline: 2px solid var(--focus-primary, var(--ud-input-border-focus));
+    outline-offset: 2px;
 }
 
 #undiscord .sizeMedium {
@@ -209,15 +287,23 @@
 
 /* lookFilled colorPrimary */
 #undiscord .accent {
-    background-color: var(--brand-experiment);
+    background-color: var(--brand-experiment, var(--brand-500, #5865f2));
 }
 
 #undiscord .danger {
-    background-color: var(--button-danger-background);
+    background-color: var(--button-danger-background, var(--ud-danger));
+}
+
+#undiscord .danger:hover {
+    background-color: var(--button-danger-background-hover, var(--ud-danger-hover));
 }
 
 #undiscord .positive {
-    background-color: var(--button-positive-background);
+    background-color: var(--button-positive-background, var(--ud-positive));
+}
+
+#undiscord .positive:hover {
+    background-color: var(--button-positive-background-hover, var(--ud-positive-hover));
 }
 
 #undiscord .info {
@@ -269,7 +355,7 @@
 
 #undiscord.redact x:not(:active) {
     color: transparent !important;
-    background-color: var(--primary-700) !important;
+    background-color: var(--primary-700, #5865f2) !important;
     cursor: default;
     user-select: none;
 }
@@ -301,7 +387,7 @@
     -webkit-text-security: disc !important;
 }
 
-#undiscord :disabled {
+#undiscord button:disabled {
     display: none;
 }
 
@@ -328,7 +414,7 @@
 }
 
 #undiscord .log {
-    margin-bottom: 0.25em;
+    margin-bottom: 0.4em;
 }
 
 #undiscord .log-debug {
@@ -340,7 +426,7 @@
 }
 
 #undiscord .log-verb {
-    color: #72767d;
+    color: #b5bac1;
 }
 
 #undiscord .log-warn {

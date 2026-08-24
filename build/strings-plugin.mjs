@@ -1,4 +1,4 @@
-import { createFilter } from 'rollup-pluginutils';
+import { createFilter } from '@rollup/pluginutils';
 
 export function string(opts = {}) {
   if (!opts.include) {
@@ -14,10 +14,10 @@ export function string(opts = {}) {
       if (filter(id)) {
         if (opts.transform) code = opts.transform(code, id, opts);
         return {
-          code:  'export default (`\n'+ code + '\n`);',
-          map: { mappings: '' }
+          code: `export default ${JSON.stringify(code)};`,
+          map: { mappings: '' },
         };
       }
-    }
+    },
   };
 }

@@ -31,7 +31,6 @@ export default class DragResize {
       createHandlers: true,
     }, options);
     Object.assign(this, options);
-    options = undefined;
 
     elm.style.position = 'fixed';
 
@@ -61,7 +60,6 @@ export default class DragResize {
 class Draggable {
   constructor(targetElm, handleElm, op, options) {
     Object.assign(this, options);
-    options = undefined;
 
     this._targetElm = targetElm;
     this._handleElm = handleElm;

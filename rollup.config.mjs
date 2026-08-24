@@ -1,6 +1,6 @@
 import fs from 'fs';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import banner from 'rollup-plugin-banner2';
 import json from '@rollup/plugin-json';
 import serve from 'rollup-plugin-serve';
@@ -89,7 +89,7 @@ const config = [
       ...devPlugins,
       bakedEnv(),
       json(),
-      resolve(),
+      nodeResolve(),
       commonjs(),
 
       banner(userScriptMetadataBlock),
@@ -105,6 +105,7 @@ const config = [
         transform(code, id) {
           // compact CSS
           return code
+            .replace(/\r\n?/g, '\n') // normalize Windows line endings
             .replace(/^\s*\n/gm, '') // remove empty lines
             .replace(/\{\n */g, '{ ') // remove line break after {
             .replace(/;\n */g, '; ') // remove line breaks after ;

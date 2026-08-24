@@ -15,6 +15,15 @@
 > ⚠️ **Any tool that automates actions on user accounts, including this one, could result in account termination.** (see [self-bots][self-bots]).  
 > Use at your own risk! ([discussion](https://github.com/victornpb/undiscord/discussions/273)).
 
+## Fixed fork (5.3.7)
+
+This fork carries compatibility, reliability, and UI repairs for Discord's current web interface while preserving attribution to the original Undiscord project.
+
+- [Install the fixed userscript](https://raw.githubusercontent.com/Void-Man-1/undiscord/master/deleteDiscordMessages.user.js)
+- [Read the complete fix list](./FIXES-5.3.7.md)
+
+The launcher is rendered as an Undiscord-owned overlay. It reads Discord's toolbar geometry but does not move, reparent, resize, hide, or restyle native Discord controls.
+
 (Due to changes in chrome manifest V3, [Brave browser][brave_browser] is recommended)
 
 1. First you need a Browser Extension for managing UserScripts[[1]][userscrips_faq] (skip if you already have one): '

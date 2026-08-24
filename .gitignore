@@ -167,6 +167,8 @@ docs/_book
 
 # TODO: where does this rule come from?
 test/
+!test/
+!test/*.test.js
 
 
 # VisualStudioCode
@@ -382,4 +384,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
