@@ -24,7 +24,7 @@ The fork identifies itself as `5.2.6-Void-fix` so it is clear that it is based o
 - [Install 5.2.6-Void-fix](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
 - [Read the full fix list](./FIXES-5.2.6-Void-fix.md)
 
-## Current description
+## Description
 
 ### Fixed fork — 5.2.6-Void-fix
 
