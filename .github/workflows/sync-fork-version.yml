@@ -39,7 +39,8 @@ jobs:
           grep -F '"version": "5.2.6-Void-fix"' package-lock.json
           grep -F '@version         5.2.6-Void-fix' deleteDiscordMessages.user.js
           grep -F 'const VERSION = "5.2.6-Void-fix";' deleteDiscordMessages.user.js
-          ! grep -R -F '5.3.7' --exclude-dir=.git --exclude='package-lock.json' .
+          OLD_VERSION='5.3'.'7'
+          ! grep -R -F "$OLD_VERSION" --exclude-dir=.git --exclude='package-lock.json' .
 
       - name: Commit generated files
         shell: bash
