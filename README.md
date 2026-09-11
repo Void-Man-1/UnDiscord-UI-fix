@@ -19,6 +19,10 @@
 
 [![][greasyfork_icon]](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js) or [![][openuserjs_icon]](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
 
+**This is a userscript, so you need a userscript manager installed in your browser first.** Use either Violentmonkey or Tampermonkey, then click one of the install buttons above.
+
+[![Install Violentmonkey](https://img.shields.io/badge/Install-Violentmonkey-5865F2?style=for-the-badge)](https://chrome.google.com/webstore/detail/violent-monkey/jinjaccalgkegednnccohejagnlnfdag) [![Install Tampermonkey](https://img.shields.io/badge/Install-Tampermonkey-5865F2?style=for-the-badge)](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+
 ## At a glance
 
 This is an unofficial maintenance fork of Undiscord 5.2.6 for the current Discord web interface. It fixes the launcher and UI compatibility, improves message deletion reliability, and cleans up a number of filtering, logging, retry, and error-handling problems.
