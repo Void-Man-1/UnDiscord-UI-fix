@@ -1,0 +1,54 @@
+name: Sync fork version metadata
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync-fork-version.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Refresh lockfile metadata
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build userscript
+        run: npm run build
+
+      - name: Verify fork version
+        shell: bash
+        run: |
+          grep -F '"version": "5.2.6-Void-fix"' package.json
+          grep -F '"version": "5.2.6-Void-fix"' package-lock.json
+          grep -F '@version         5.2.6-Void-fix' deleteDiscordMessages.user.js
+          grep -F 'const VERSION = "5.2.6-Void-fix";' deleteDiscordMessages.user.js
+          ! grep -R -F '5.3.7' --exclude-dir=.git --exclude='package-lock.json' .
+
+      - name: Commit generated files
+        shell: bash
+        run: |
+          if git diff --quiet -- package-lock.json deleteDiscordMessages.user.js; then
+            echo 'Generated files are already current.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json deleteDiscordMessages.user.js
+          git commit -m 'chore: sync 5.2.6-Void-fix generated files'
+          git push
