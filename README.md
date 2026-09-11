@@ -15,6 +15,10 @@
 > ⚠️ **Any tool that automates actions on user accounts, including this one, could result in account termination.** (see [self-bots][self-bots]).  
 > Use at your own risk! ([discussion](https://github.com/victornpb/undiscord/discussions/273)).
 
+### Install 5.2.6-Void-fix
+
+[![][greasyfork_icon]](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js) or [![][openuserjs_icon]](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
+
 ## At a glance
 
 This is an unofficial maintenance fork of Undiscord 5.2.6 for the current Discord web interface. It fixes the launcher and UI compatibility, improves message deletion reliability, and cleans up a number of filtering, logging, retry, and error-handling problems.
