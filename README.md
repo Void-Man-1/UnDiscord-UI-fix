@@ -15,7 +15,18 @@
 > ⚠️ **Any tool that automates actions on user accounts, including this one, could result in account termination.** (see [self-bots][self-bots]).  
 > Use at your own risk! ([discussion](https://github.com/victornpb/undiscord/discussions/273)).
 
-## Fixed fork — 5.2.6-Void-fix
+## At a glance
+
+This is an unofficial maintenance fork of Undiscord 5.2.6 for the current Discord web interface. It fixes the launcher and UI compatibility, improves message deletion reliability, and cleans up a number of filtering, logging, retry, and error-handling problems.
+
+The fork identifies itself as `5.2.6-Void-fix` so it is clear that it is based on upstream 5.2.6 and is not an official Undiscord 5.3 release.
+
+- [Install 5.2.6-Void-fix](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
+- [Read the full fix list](./FIXES-5.2.6-Void-fix.md)
+
+## Current description
+
+### Fixed fork — 5.2.6-Void-fix
 
 This is an unofficial maintenance fork of Undiscord 5.2.6, updated for Discord's current web interface. The version name deliberately keeps `5.2.6` in it so it is clear that this is based on the upstream 5.2.6 release and is not an official Undiscord 5.3 release.
 
@@ -74,6 +85,130 @@ The built userscript was also checked against current DM and server-channel layo
 - [Install 5.2.6-Void-fix](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
 - [Read the full fix list](./FIXES-5.2.6-Void-fix.md)
 
+## For nerds
+
+### Launcher / DOM integration
+
+The launcher no longer gets appended to Discord's React-owned toolbar. It is mounted under `document.body` as an Undiscord-owned `position: fixed` overlay. Discord's DOM is used only as a geometry source.
+
+Relevant implementation details:
+
+- route detection uses `^/channels/(?:@me|\d+)/\d+/?$`;
+- the channel header is located through `[aria-label="Channel header"]` plus toolbar/action fallbacks;
+- a real loaded channel is confirmed using selectors such as `[data-list-id="chat-messages"]`, `[class*="messagesWrapper"]`, and `[role="textbox"]`;
+- `getBoundingClientRect()` is used to place the overlay next to the last stable native toolbar action;
+- launcher mount delay is 400 ms and the native-control gap is 22 px;
+- DOM mutations are throttled to 250 ms instead of remounting immediately on every React mutation;
+- resize events recalculate the overlay position;
+- duplicate initialization is rejected if `#undiscord` or `#undiscord-btn` already exists;
+- the launcher is hidden while the Undiscord panel is open and `aria-expanded` tracks panel state.
+
+Because the launcher is outside the native toolbar, Discord controls are never reparented, resized, hidden, or restyled by the fork.
+
+### Search state machine and API recovery
+
+Search retries were changed from recursive re-entry to bounded iterative retry logic. The current defaults are:
+
+```text
+jobDelay:              1000 ms
+emptyPageRetries:      2
+searchRequestTimeout:  60000 ms
+searchRequestRetries:  3
+searchRetryDelay:      2000 ms
+```
+
+The request path uses `AbortSignal.timeout()` for hard request timeouts. HTTP 202 and 429 responses are retried with Discord's `retry_after` value when available, with a bounded fallback rather than unbounded recursion.
+
+Transient HTTP statuses handled as retryable include:
+
+```text
+408  Request Timeout
+425  Too Early
+500  Internal Server Error
+502  Bad Gateway
+503  Service Unavailable
+504  Gateway Timeout
+```
+
+A 403, Discord error `50001` (Missing Access), or `50024` is treated as a channel that cannot be searched and is skipped cleanly. Empty search pages can also be retried when Discord reports that more results should still exist.
+
+Unexpected or malformed API responses fail through a controlled error path instead of silently poisoning pagination state.
+
+### Deletion behavior
+
+Deletion retries are bounded as well. A terminally undeletable message increments the failure count and advances the offset, which prevents the same message from being rediscovered indefinitely by the next search page.
+
+Discord error `50083` for archived threads is treated as a skip condition. Temporary 5xx failures are retryable, and invalid or missing rate-limit values fall back to bounded delays. Delete delay growth is capped rather than increasing forever.
+
+Progress accounting now separates successful deletions from failed ones, and ETR is calculated from the remaining work rather than the original total:
+
+```text
+remaining = grandTotal - delCount - failCount
+```
+
+### Filtering and Discord message types
+
+The fork uses an explicit set of deletable Discord message types instead of assuming every search hit is safe to delete:
+
+```text
+0, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+15, 16, 17, 18, 19, 46
+```
+
+Type `46` poll messages are supported. Type `20` application-command messages are deliberately excluded.
+
+Regular-expression filters now fail closed: an invalid pattern produces an error and an empty deletion set instead of dropping the regex filter and potentially matching more messages than the user intended.
+
+### Snowflakes, IDs, and Discord internals
+
+Date filtering converts Discord snowflakes using `BigInt`, avoiding precision loss from JavaScript `Number` when working with 64-bit IDs.
+
+Token and current-user lookup was also changed. The old code triggered a fake `beforeunload` event and could leave a temporary iframe behind. The fork reads local storage through a hidden iframe and removes it in `finally`, then falls back to Discord's webpack module cache when necessary.
+
+Webpack lookup injects a temporary chunk to capture the runtime `require`, removes that temporary chunk afterward, and defensively scans the module cache for methods such as `getToken` and `getCurrentUser`.
+
+### Message picker lifecycle
+
+The old picker modified Discord's chat surface and depended mainly on click behavior. The current picker installs capture listeners only while a pick operation is active.
+
+It supports:
+
+- click capture;
+- Escape cancellation;
+- a 30-second timeout;
+- deterministic listener/timer cleanup;
+- current Discord message node patterns such as `[id^="message-content-"]` and `[id^="chat-messages-"]`.
+
+The prompt is rendered by Undiscord instead of rewriting Discord's message hover UI.
+
+### Logging and UI safety
+
+External message content is HTML-escaped before being inserted into the visible log. The UI logger also:
+
+- limits retained log entries to 5,000;
+- serializes `Error` objects explicitly;
+- handles circular objects;
+- restricts log type names to a known set;
+- bounds large diagnostic blocks so API payloads cannot expand the panel indefinitely;
+- summarizes attachments and large Discord responses rather than dumping raw objects.
+
+### Build and verification
+
+The fork uses current Rollup configuration and ESLint flat config instead of the old `.eslintrc` setup. The generated userscript is built from the source tree, and the repository includes 25 automated core/DOM tests covering:
+
+- API retry and failure behavior;
+- search pagination;
+- filtering;
+- launcher placement;
+- preservation of native Discord toolbar nodes;
+- panel lifecycle;
+- message picking;
+- helper functions.
+
+The generated userscript and package metadata use the fork version `5.2.6-Void-fix` so the repository does not present the fork as an upstream `5.3.x` release.
+
+## Original description
+
 (Due to changes in chrome manifest V3, [Brave browser][brave_browser] is recommended)
 
 1. First you need a Browser Extension for managing UserScripts[[1]][userscrips_faq] (skip if you already have one):
@@ -130,7 +265,7 @@ Originally from https://gist.github.com/victornpb/135f5b346dea4decfc8f63ad7d9cc1
 
 Sharing your authToken on the internet will give full access to your account! [There are bots gathering credentials all over the internet](https://github.com/rndinfosecguy/Scavenger).
 If you post your token by accident, LOGOUT from discord on that **same browser** you got that token imediately.
-Changing your password will make sure that you get logged out of every device. I advice that you turn on [2FA](https://support.discord.com/hc/en-us/articles/219576828-Setting-up-Two-Factor-Authentication) afterwards.
+Changing your password will make sure you get logged out of every device. I advice that you turn on [2FA](https://support.discord.com/hc/en-us/articles/219576828-Setting-up-Two-Factor-Authentication) afterwards.
 
 If you are unsure do not post screenshots, or logs on the internet.
 
