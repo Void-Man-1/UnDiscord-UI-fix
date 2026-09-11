@@ -15,18 +15,68 @@
 > ⚠️ **Any tool that automates actions on user accounts, including this one, could result in account termination.** (see [self-bots][self-bots]).  
 > Use at your own risk! ([discussion](https://github.com/victornpb/undiscord/discussions/273)).
 
-## Fixed fork (5.3.7)
+## Fixed fork — 5.2.6-Void-fix
 
-This fork carries compatibility, reliability, and UI repairs for Discord's current web interface while preserving attribution to the original Undiscord project.
+This is an unofficial maintenance fork of Undiscord 5.2.6, updated for Discord's current web interface. The version name deliberately keeps `5.2.6` in it so it is clear that this is based on the upstream 5.2.6 release and is not an official Undiscord 5.3 release.
 
-- [Install the fixed userscript](https://raw.githubusercontent.com/Void-Man-1/undiscord/master/deleteDiscordMessages.user.js)
-- [Read the complete fix list](./FIXES-5.3.7.md)
+The main problem was the launcher. Upstream Undiscord inserted its trash button directly into Discord's own toolbar. That depended on Discord's internal DOM structure staying roughly the same. Once Discord changed the header, the button could disappear, move native controls, leave an empty gap, or end up in the wrong place.
 
-The launcher is rendered as an Undiscord-owned overlay. It reads Discord's toolbar geometry but does not move, reparent, resize, hide, or restyle native Discord controls.
+This fork changes that approach. The launcher is now owned entirely by Undiscord and is attached to `document.body` as a fixed overlay. It still reads the position of Discord's header controls so it can line up with them visually, but it does not move, reparent, resize, hide, or restyle Discord's own toolbar elements.
+
+That keeps the button in a predictable place across DMs, group DMs, and server channels while reducing the chance that a Discord layout change will break the rest of the header.
+
+The launcher also waits until a real channel view is present before appearing, repositions itself when Discord changes routes or resizes the page, and hides while the Undiscord panel is open so it does not overlap the panel.
+
+### UI and UX changes
+
+The interface was also cleaned up for the current Discord layout rather than simply patching one broken selector.
+
+- The launcher is now a real HTML button instead of a clickable `div`, which gives it proper keyboard and accessibility behavior.
+- The old misspelled launcher ID was fixed.
+- Undiscord now uses its own fallback colors and layout values when Discord changes or removes internal CSS variables.
+- The panel, sidebar, toolbar controls, inputs, sliders, resize handles, hover states, and focus states were adjusted so they remain usable on current Discord.
+- The panel scales down more sensibly on smaller browser windows instead of letting controls spill outside the layout.
+- Message picking no longer starts with a blocking browser alert. A small in-page prompt is shown instead, and Escape cancels the picker cleanly.
+- Streamer-mode warnings are shown inside the interface instead of through browser popups.
+- Duplicate initialization is prevented so route changes do not create multiple Undiscord launchers.
+
+### Search and deletion reliability
+
+The deletion code also had a few cases where temporary Discord API behavior could make a run stop too early or retry forever.
+
+The search loop now uses bounded retries instead of recursively calling itself. It handles request timeouts, temporary network failures, Discord 5xx responses, rate limits, channels that are still being indexed, and temporarily empty search pages without turning those cases into an endless retry loop.
+
+If Discord refuses access to a channel or cannot search it, that channel is skipped cleanly instead of leaving the batch stuck there.
+
+Deletion failures are handled more carefully as well. Messages that cannot be deleted are counted and moved past instead of being rediscovered over and over. Retry timing and rate-limit handling were tightened up, and the displayed progress, failure count, and estimated time remaining were corrected.
+
+### Filtering, IDs, dates, and logs
+
+A few smaller bugs could also affect what Undiscord selected or showed:
+
+- supported Discord message types are handled more accurately;
+- deletable poll messages are supported;
+- unsupported application-command messages are excluded;
+- an invalid regular expression now fails closed instead of accidentally widening the deletion set;
+- Discord snowflake conversion for date filters uses exact integer arithmetic;
+- invalid date ranges and imported channel IDs are checked before deletion starts;
+- token and current-user detection no longer fires a fake `beforeunload` event or leaves temporary iframes behind;
+- external message content is escaped before being written to the Undiscord log;
+- large API responses and attachment objects are summarized instead of being dumped into the visible log;
+- progress output is easier to read and keeps failed messages separate from successful deletions.
+
+### Build and tests
+
+The development setup was updated for current Node.js tooling, including Rollup and ESLint. The fork also adds 25 automated unit and DOM tests covering the main areas changed here: API retries, pagination, filtering, launcher placement, preservation of Discord's native toolbar, panel behavior, helper functions, and message picking.
+
+The built userscript was also checked against current DM and server-channel layouts in Brave.
+
+- [Install 5.2.6-Void-fix](https://raw.githubusercontent.com/Void-Man-1/undiscord-UI-fix/master/deleteDiscordMessages.user.js)
+- [Read the full fix list](./FIXES-5.2.6-Void-fix.md)
 
 (Due to changes in chrome manifest V3, [Brave browser][brave_browser] is recommended)
 
-1. First you need a Browser Extension for managing UserScripts[[1]][userscrips_faq] (skip if you already have one): '
+1. First you need a Browser Extension for managing UserScripts[[1]][userscrips_faq] (skip if you already have one):
    * Brave: [Violentmonkey][chrome_violentmonkey] or [Tampermonkey][chrome_tampermonkey]
    * Chrome: [Violentmonkey][chrome_violentmonkey] or [Tampermonkey][chrome_tampermonkey]
    * Firefox: [Greasemonkey][firefox_greasemonkey], [Tampermonkey][firefox_tampermonkey], or [Violentmonkey][firefox_violentmonkey]  
